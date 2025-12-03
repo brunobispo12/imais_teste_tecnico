@@ -1,0 +1,67 @@
+
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x", "darwin-arm64", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model Patient {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  phone        String
+  appointments Appointment[]
+
+  @@map("patients")
+}
+
+model Doctor {
+  id                String           @id @default(uuid())
+  name              String
+  specialty         String
+  consultationPrice Decimal          @map("consultation_price") @db.Decimal(8, 2)
+  schedules         DoctorSchedule[]
+  appointments      Appointment[]
+
+  @@map("doctors")
+}
+
+model DoctorSchedule {
+  id                   String @id @default(uuid())
+  doctor               Doctor @relation(fields: [doctorId], references: [id])
+  doctorId             String @map("doctor_id")
+  availableFromWeekDay Int    @map("available_from_week_day")
+  availableToWeekDay   Int    @map("available_to_week_day")
+  availableFromTime    String @map("available_from_time")
+  availableToTime      String @map("available_to_time")
+
+  @@map("doctor_schedules")
+}
+
+model Appointment {
+  id        String            @id @default(uuid())
+  patient   Patient           @relation(fields: [patientId], references: [id])
+  patientId String            @map("patient_id")
+  doctor    Doctor            @relation(fields: [doctorId], references: [id])
+  doctorId  String            @map("doctor_id")
+  date      DateTime
+  status    AppointmentStatus @default(AGENDADO)
+
+  @@unique([doctorId, date])
+  @@unique([patientId, date])
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  AGENDADO
+  EM_CONSULTA
+  FINALIZADO
+  CANCELADO
+}

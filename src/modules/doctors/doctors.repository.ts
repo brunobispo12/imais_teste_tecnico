@@ -1,0 +1,105 @@
+import { prisma } from '@/services/prisma.service';
+import { Prisma } from '@prisma/client';
+import { DoctorDTO } from '@/modules/doctors/types/doctor.dto';
+import { DoctorWithSchedulesDTO } from '@/modules/doctors/types/doctor-with-schedules.dto';
+import { DoctorScheduleDTO } from '@/modules/doctors/types/doctor-schedule.dto';
+
+export class DoctorsRepository {
+  async create(data: Prisma.DoctorCreateInput): Promise<DoctorDTO> {
+    const doctor = await prisma.doctor.create({
+      data,
+    });
+    return {
+      ...doctor,
+      consultationPrice: Number(doctor.consultationPrice),
+    };
+  }
+
+  async findById(id: string): Promise<DoctorWithSchedulesDTO | null> {
+    const doctor = await prisma.doctor.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        schedules: true,
+      },
+    });
+
+    if (!doctor) return null;
+
+    return {
+      ...doctor,
+      consultationPrice: Number(doctor.consultationPrice),
+      schedules: doctor.schedules.map((schedule) => ({
+        ...schedule,
+      })),
+    };
+  }
+
+  async update(id: string, data: Prisma.DoctorUpdateInput): Promise<DoctorDTO> {
+    const doctor = await prisma.doctor.update({
+      where: {
+        id,
+      },
+      data,
+    });
+    return {
+      ...doctor,
+      consultationPrice: Number(doctor.consultationPrice),
+    };
+  }
+
+  async delete(id: string) {
+    return await prisma.doctor.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async createSchedule(data: Prisma.DoctorScheduleCreateInput): Promise<DoctorScheduleDTO> {
+    const schedule = await prisma.doctorSchedule.create({
+      data,
+    });
+    return schedule;
+  }
+
+  async findConflicts(
+    doctorId: string,
+    weekDay: number,
+    start: string,
+    end: string,
+  ) {
+
+    const conflicts = await prisma.doctorSchedule.findMany({
+      where: {
+        doctorId,
+        OR: [
+
+          {
+            availableFromWeekDay: { lte: weekDay },
+            availableToWeekDay: { gte: weekDay },
+            availableFromTime: { lte: start },
+            availableToTime: { gte: end },
+          },
+
+          {
+            availableFromWeekDay: { lte: weekDay },
+            availableToWeekDay: { gte: weekDay },
+            availableFromTime: { gte: start, lt: end },
+          },
+
+          {
+            availableFromWeekDay: { lte: weekDay },
+            availableToWeekDay: { gte: weekDay },
+            availableToTime: { gt: start, lte: end },
+          },
+        ],
+      },
+    });
+
+    return conflicts.length > 0;
+  }
+}
+
+export const doctorsRepository = new DoctorsRepository();
