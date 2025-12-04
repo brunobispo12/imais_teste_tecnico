@@ -8,6 +8,7 @@
     "start": "node --experimental-specifier-resolution=node dist/src/server.js",
     "seed": "prisma db seed",
     "clean-db": "tsx prisma/clean.ts",
+    "pretest": "prisma generate",
     "test": "vitest"
   },
   "keywords": [],

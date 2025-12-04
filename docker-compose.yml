@@ -24,6 +24,8 @@ services:
       db:
         condition: service_healthy
     env_file: .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/imais_codes
     ports:
       - "20050:20050"
     restart: unless-stopped

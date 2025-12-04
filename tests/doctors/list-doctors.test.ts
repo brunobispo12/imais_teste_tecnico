@@ -55,6 +55,6 @@ describe('GET /doctors (paginated)', () => {
       `${prefix}-05`,
       `${prefix}-06`,
     ]);
-    expect(response.body.data[0].consultationPrice).toMatch(/^R\\$/);
+    expect(response.body.data[0].consultationPrice).toMatch(/^R\$(\s|\u00a0)?\d/);
   });
 });

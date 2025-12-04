@@ -62,15 +62,22 @@ export function buildApp(): FastifyInstance {
 
   app.register(routes, { prefix: '/api' });
 
-  app.setErrorHandler((error, _request, reply) => {
+  app.setErrorHandler((error: unknown, _request, reply) => {
     if (error instanceof ZodError || (error as any)?.issues) {
       return sendValidationError(reply, error);
     }
 
-    const statusCode = (error as any)?.statusCode ?? 500;
-    const message = statusCode >= 500
-      ? 'Erro interno no servidor'
-      : error.message ?? 'Erro inesperado';
+    const statusCode =
+      typeof (error as any)?.statusCode === 'number'
+        ? (error as any).statusCode
+        : 500;
+
+    const message =
+      statusCode >= 500
+        ? 'Erro interno no servidor'
+        : typeof (error as any)?.message === 'string'
+          ? (error as any).message
+          : 'Erro inesperado';
 
     return reply.status(statusCode).send({
       error: {
