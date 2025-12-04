@@ -3,10 +3,12 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createPatientBodySchema } from '@/modules/patients/schema/create-patient.schema';
 import { getPatientParamsSchema } from '@/modules/patients/schema/get-patient-params.schema';
 import { getPatientQuerySchema } from '@/modules/patients/schema/get-patient-query.schema';
+import { listPatientsQuerySchema } from '@/modules/patients/schema/list-patients-query.schema';
 import { updatePatientBodySchema } from '@/modules/patients/schema/update-patient.schema';
 import {
   createPatientController,
   deletePatientController,
+  listPatientsController,
   getPatientWithAppointmentsController,
   updatePatientController,
 } from '@/modules/patients/patients.controller';
@@ -18,6 +20,13 @@ export default async function patientsRoutes(app: FastifyInstance) {
       body: createPatientBodySchema,
     },
   }, createPatientController);
+
+  app.withTypeProvider<ZodTypeProvider>().get('/patients', {
+    schema: {
+      tags: ['Patients'],
+      querystring: listPatientsQuerySchema,
+    },
+  }, listPatientsController);
 
   app.withTypeProvider<ZodTypeProvider>().get('/patient/:patientId', {
     schema: {

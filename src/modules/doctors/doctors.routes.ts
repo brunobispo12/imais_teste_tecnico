@@ -2,12 +2,14 @@ import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createDoctorBodySchema } from '@/modules/doctors/schema/create-doctor.schema';
 import { createScheduleBodySchema } from '@/modules/doctors/schema/create-schedule.schema';
+import { listDoctorsQuerySchema } from '@/modules/doctors/schema/list-doctors-query.schema';
 import { getDoctorParamsSchema } from '@/modules/doctors/schema/get-doctor-params.schema';
 import { updateDoctorBodySchema } from '@/modules/doctors/schema/update-doctor.schema';
 import {
   createDoctorController,
   createDoctorScheduleController,
   deleteDoctorController,
+  listDoctorsController,
   updateDoctorController,
 } from '@/modules/doctors/doctors.controller';
 
@@ -18,6 +20,13 @@ export default async function doctorsRoutes(app: FastifyInstance) {
       body: createDoctorBodySchema,
     },
   }, createDoctorController);
+
+  app.withTypeProvider<ZodTypeProvider>().get('/doctors', {
+    schema: {
+      tags: ['Doctors'],
+      querystring: listDoctorsQuerySchema,
+    },
+  }, listDoctorsController);
 
   app.withTypeProvider<ZodTypeProvider>().post('/doctors/:doctorId/agenda', {
     schema: {

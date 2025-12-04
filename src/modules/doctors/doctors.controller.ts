@@ -1,6 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { CreateDoctorBody } from '@/modules/doctors/schema/create-doctor.schema';
 import { CreateScheduleBody } from '@/modules/doctors/schema/create-schedule.schema';
+import { ListDoctorsQuery } from '@/modules/doctors/schema/list-doctors-query.schema';
 import { GetDoctorParams } from '@/modules/doctors/schema/get-doctor-params.schema';
 import { UpdateDoctorBody } from '@/modules/doctors/schema/update-doctor.schema';
 import { doctorsService } from '@/modules/doctors/doctors.service';
@@ -13,6 +14,14 @@ export async function createDoctorController(
   const data = request.body;
   const doctor = await doctorsService.create(data);
   return reply.status(201).send(doctor);
+}
+
+export async function listDoctorsController(
+  request: FastifyRequest<{ Querystring: ListDoctorsQuery }>,
+  reply: FastifyReply,
+) {
+  const result = await doctorsService.list(request.query);
+  return reply.send(result);
 }
 
 export async function createDoctorScheduleController(

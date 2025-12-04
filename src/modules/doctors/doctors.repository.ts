@@ -57,6 +57,27 @@ export class DoctorsRepository {
     });
   }
 
+  async findAll(page: number = 1, limit: number = 10) {
+    const [doctors, total] = await Promise.all([
+      prisma.doctor.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: {
+          name: 'asc',
+        },
+      }),
+      prisma.doctor.count(),
+    ]);
+
+    return {
+      doctors: doctors.map((doctor) => ({
+        ...doctor,
+        consultationPrice: Number(doctor.consultationPrice),
+      })),
+      total,
+    };
+  }
+
   async createSchedule(data: Prisma.DoctorScheduleCreateInput): Promise<DoctorScheduleDTO> {
     const schedule = await prisma.doctorSchedule.create({
       data,

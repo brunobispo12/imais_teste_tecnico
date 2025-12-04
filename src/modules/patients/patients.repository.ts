@@ -24,6 +24,21 @@ export class PatientsRepository {
     });
   }
 
+  async findAll(page: number = 1, limit: number = 10) {
+    const [patients, total] = await Promise.all([
+      prisma.patient.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: {
+          name: 'asc',
+        },
+      }),
+      prisma.patient.count(),
+    ]);
+
+    return { patients, total };
+  }
+
   async findByIdWithAppointments(id: string, page: number = 1, limit: number = 10) {
     return await prisma.patient.findUnique({
       where: {

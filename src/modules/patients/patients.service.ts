@@ -1,5 +1,6 @@
 import { patientsRepository } from '@/modules/patients/patients.repository';
 import { CreatePatientBody } from '@/modules/patients/schema/create-patient.schema';
+import { ListPatientsQuery } from '@/modules/patients/schema/list-patients-query.schema';
 import { UpdatePatientBody } from '@/modules/patients/schema/update-patient.schema';
 import { PatientDTO } from '@/modules/patients/types/patient.dto';
 import { PatientWithAppointmentsDTO } from '@/modules/patients/types/patient-with-appointments.dto';
@@ -51,6 +52,20 @@ export class PatientsService {
           currency: 'BRL',
         }).format(Number(appointment.doctor.consultationPrice)),
       })),
+    };
+  }
+
+  async list(params: ListPatientsQuery) {
+    const { page = 1, limit = 10 } = params;
+    const { patients, total } = await patientsRepository.findAll(page, limit);
+
+    return {
+      data: patients,
+      meta: {
+        page,
+        limit,
+        total,
+      },
     };
   }
 

@@ -1,6 +1,7 @@
 import { doctorsRepository } from '@/modules/doctors/doctors.repository';
 import { CreateDoctorBody } from '@/modules/doctors/schema/create-doctor.schema';
 import { CreateScheduleBody } from '@/modules/doctors/schema/create-schedule.schema';
+import { ListDoctorsQuery } from '@/modules/doctors/schema/list-doctors-query.schema';
 import { UpdateDoctorBody } from '@/modules/doctors/schema/update-doctor.schema';
 import { DoctorDTO } from '@/modules/doctors/types/doctor.dto';
 import { DoctorScheduleDTO } from '@/modules/doctors/types/doctor-schedule.dto';
@@ -71,6 +72,20 @@ export class DoctorsService {
 
     await doctorsRepository.delete(id);
     return true;
+  }
+
+  async list(params: ListDoctorsQuery) {
+    const { page = 1, limit = 10 } = params;
+    const { doctors, total } = await doctorsRepository.findAll(page, limit);
+
+    return {
+      data: doctors,
+      meta: {
+        page,
+        limit,
+        total,
+      },
+    };
   }
 }
 

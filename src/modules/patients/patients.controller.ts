@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { CreatePatientBody } from '@/modules/patients/schema/create-patient.schema';
 import { GetPatientParams } from '@/modules/patients/schema/get-patient-params.schema';
 import { GetPatientQuery } from '@/modules/patients/schema/get-patient-query.schema';
+import { ListPatientsQuery } from '@/modules/patients/schema/list-patients-query.schema';
 import { UpdatePatientBody } from '@/modules/patients/schema/update-patient.schema';
 import { sendConflictError, sendNotFoundError } from '@/shared/errors';
 import { patientService } from '@/modules/patients/patients.service';
@@ -24,6 +25,16 @@ export async function createPatientController(
   const patient = await patientService.create({ name, email, phone });
 
   return reply.status(201).send(patient);
+}
+
+
+export async function listPatientsController(
+  request: FastifyRequest<{ Querystring: ListPatientsQuery }>,
+  reply: FastifyReply,
+) {
+  const result = await patientService.list(request.query);
+
+  return reply.send(result);
 }
 
 
