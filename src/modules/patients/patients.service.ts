@@ -4,15 +4,7 @@ import { ListPatientsQuery } from '@/modules/patients/schema/list-patients-query
 import { UpdatePatientBody } from '@/modules/patients/schema/update-patient.schema';
 import { PatientDTO } from '@/modules/patients/types/patient.dto';
 import { PatientWithAppointmentsDTO } from '@/modules/patients/types/patient-with-appointments.dto';
-import { AppointmentStatusDTO } from '@/modules/appointments/types/appointment-status.dto';
 import { formatDateLabel, formatPriceBRL, formatTimeLabel } from '@/shared/utils/formatters';
-
-const statusMap: Record<string, AppointmentStatusDTO> = {
-  AGENDADO: 'SCHEDULED',
-  EM_CONSULTA: 'IN_CONSULTATION',
-  FINALIZADO: 'FINISHED',
-  CANCELADO: 'CANCELLED',
-};
 
 export class PatientsService {
   async create(data: CreatePatientBody): Promise<PatientDTO> {
@@ -39,9 +31,7 @@ export class PatientsService {
         id: appointment.id,
         date: formatDateLabel(appointment.date),
         time: formatTimeLabel(appointment.date),
-        formattedDate: formatDateLabel(appointment.date),
-        formattedTime: formatTimeLabel(appointment.date),
-        status: statusMap[appointment.status] || 'SCHEDULED',
+        status: appointment.status,
         doctor: {
           id: appointment.doctor.id,
           name: appointment.doctor.name,

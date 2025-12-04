@@ -70,7 +70,7 @@ describe('POST /appointments', () => {
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('id');
-    expect(response.body.status).toBe('SCHEDULED');
+    expect(response.body.status).toBe('AGENDADO');
   });
 
   it('should return 409 if doctor already has appointment', async () => {

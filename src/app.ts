@@ -8,6 +8,8 @@ import {
   ZodTypeProvider,
 } from 'fastify-type-provider-zod';
 import routes from '@/routes';
+import { ZodError } from 'zod';
+import { sendValidationError } from '@/shared/errors';
 
 export function buildApp(): FastifyInstance {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
@@ -59,6 +61,24 @@ export function buildApp(): FastifyInstance {
   });
 
   app.register(routes, { prefix: '/api' });
+
+  app.setErrorHandler((error, _request, reply) => {
+    if (error instanceof ZodError || (error as any)?.issues) {
+      return sendValidationError(reply, error);
+    }
+
+    const statusCode = (error as any)?.statusCode ?? 500;
+    const message = statusCode >= 500
+      ? 'Erro interno no servidor'
+      : error.message ?? 'Erro inesperado';
+
+    return reply.status(statusCode).send({
+      error: {
+        code: statusCode >= 500 ? 'INTERNAL_SERVER_ERROR' : 'UNHANDLED_ERROR',
+        message,
+      },
+    });
+  });
 
   return app;
 }

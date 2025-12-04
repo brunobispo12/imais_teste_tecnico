@@ -54,8 +54,6 @@ model Appointment {
   date      DateTime
   status    AppointmentStatus @default(AGENDADO)
 
-  @@unique([doctorId, date])
-  @@unique([patientId, date])
   @@map("appointments")
 }
 

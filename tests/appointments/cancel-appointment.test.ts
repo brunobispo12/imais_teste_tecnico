@@ -107,7 +107,7 @@ describe('PATCH /appointments/:appointmentId/cancel', () => {
         .patch(`/api/appointments/${id}/cancel`);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('menos de 2 horas');
+      expect(response.body.error.message).toContain('menos de 2 horas');
     }
   });
 });

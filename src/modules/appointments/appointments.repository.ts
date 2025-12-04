@@ -25,22 +25,24 @@ export class AppointmentsRepository {
   }
 
   async findByDoctorAndDate(doctorId: string, date: Date) {
-    return await prisma.appointment.findUnique({
+    return await prisma.appointment.findFirst({
       where: {
-        doctorId_date: {
-          doctorId,
-          date,
+        doctorId,
+        date,
+        status: {
+          not: 'CANCELADO',
         },
       },
     });
   }
 
   async findByPatientAndDate(patientId: string, date: Date) {
-    return await prisma.appointment.findUnique({
+    return await prisma.appointment.findFirst({
       where: {
-        patientId_date: {
-          patientId,
-          date,
+        patientId,
+        date,
+        status: {
+          not: 'CANCELADO',
         },
       },
     });

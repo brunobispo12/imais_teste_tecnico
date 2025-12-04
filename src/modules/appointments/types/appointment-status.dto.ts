@@ -1,5 +1,5 @@
 export type AppointmentStatusDTO =
-  | 'SCHEDULED'       
-  | 'IN_CONSULTATION' 
-  | 'FINISHED'       
-  | 'CANCELLED';    
+  | 'AGENDADO'
+  | 'EM_CONSULTA'
+  | 'FINALIZADO'
+  | 'CANCELADO';

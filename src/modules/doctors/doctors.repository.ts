@@ -91,35 +91,29 @@ export class DoctorsRepository {
     start: string,
     end: string,
   ) {
+    const toSeconds = (time: string) => {
+      const [h, m, s] = time.split(':').map(Number);
+      return h * 3600 + m * 60 + s;
+    };
 
-    const conflicts = await prisma.doctorSchedule.findMany({
-      where: {
-        doctorId,
-        OR: [
+    const requestedStart = toSeconds(start);
+    const requestedEnd = toSeconds(end);
 
-          {
-            availableFromWeekDay: { lte: weekDay },
-            availableToWeekDay: { gte: weekDay },
-            availableFromTime: { lte: start },
-            availableToTime: { gte: end },
-          },
-
-          {
-            availableFromWeekDay: { lte: weekDay },
-            availableToWeekDay: { gte: weekDay },
-            availableFromTime: { gte: start, lt: end },
-          },
-
-          {
-            availableFromWeekDay: { lte: weekDay },
-            availableToWeekDay: { gte: weekDay },
-            availableToTime: { gt: start, lte: end },
-          },
-        ],
-      },
+    const schedules = await prisma.doctorSchedule.findMany({
+      where: { doctorId },
     });
 
-    return conflicts.length > 0;
+    return schedules.some((schedule) => {
+      if (weekDay < schedule.availableFromWeekDay || weekDay > schedule.availableToWeekDay) {
+        return false;
+      }
+
+      const existingStart = toSeconds(schedule.availableFromTime);
+      const existingEnd = toSeconds(schedule.availableToTime);
+
+      const overlaps = requestedStart < existingEnd && requestedEnd > existingStart;
+      return overlaps;
+    });
   }
 }
 

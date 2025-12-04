@@ -1,15 +1,26 @@
 import { appointmentsRepository } from '@/modules/appointments/appointments.repository';
 import { doctorsRepository } from '@/modules/doctors/doctors.repository';
+import { patientsRepository } from '@/modules/patients/patients.repository';
 import { CreateAppointmentBody } from '@/modules/appointments/schema/create-appointment.schema';
 import { AppointmentDTO } from '@/modules/appointments/types/appointment.dto';
 import { mailtrapClient } from '@/services/mailtrap.service';
 import { formatDateLabel, formatPriceBRL, formatTimeLabel } from '@/shared/utils/formatters';
+
+const timeToSeconds = (time: string) => {
+  const [h, m, s] = time.split(':').map(Number);
+  return h * 3600 + m * 60 + s;
+};
 
 export class AppointmentsService {
   async create(data: CreateAppointmentBody): Promise<AppointmentDTO> {
     const appointmentDate = new Date(`${data.date}T${data.time}`);
     const weekDay = appointmentDate.getDay();
 
+
+    const patient = await patientsRepository.findById(data.patientId);
+    if (!patient) {
+      throw new Error('Patient not found');
+    }
 
     const doctor = await doctorsRepository.findById(data.doctorId);
     if (!doctor) {
@@ -19,12 +30,16 @@ export class AppointmentsService {
 
 
 
-    const schedule = doctor.schedules.find(s =>
-      weekDay >= s.availableFromWeekDay &&
-      weekDay <= s.availableToWeekDay &&
-      data.time >= s.availableFromTime &&
-      data.time <= s.availableToTime
-    );
+    const schedule = doctor.schedules.find(s => {
+      if (weekDay < s.availableFromWeekDay || weekDay > s.availableToWeekDay) {
+        return false;
+      }
+      const reqSeconds = timeToSeconds(data.time);
+      return (
+        reqSeconds >= timeToSeconds(s.availableFromTime) &&
+        reqSeconds <= timeToSeconds(s.availableToTime)
+      );
+    });
 
 
 
@@ -60,16 +75,14 @@ export class AppointmentsService {
 
     return {
       id: appointment.id,
-      date: data.date,
-      time: data.time,
-      status: 'SCHEDULED',
+      date: formatDateLabel(appointmentDate),
+      time: formatTimeLabel(appointmentDate),
+      status: appointment.status,
       doctor: {
         id: appointment.doctor.id,
         name: appointment.doctor.name,
         specialty: appointment.doctor.specialty,
       },
-      formattedDate: formatDateLabel(appointmentDate),
-      formattedTime: formatTimeLabel(appointmentDate),
       price: formatPriceBRL(appointment.doctor.consultationPrice),
     };
   }

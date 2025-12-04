@@ -4,8 +4,6 @@ export interface AppointmentDTO {
   id: string;
   date: string;
   time: string;
-  formattedDate: string;
-  formattedTime: string;
   status: AppointmentStatusDTO;
   doctor: {
     id: string;

@@ -7,7 +7,6 @@ import { UpdatePatientBody } from '@/modules/patients/schema/update-patient.sche
 import { sendConflictError, sendNotFoundError } from '@/shared/errors';
 import { patientService } from '@/modules/patients/patients.service';
 
-
 export async function createPatientController(
   request: FastifyRequest<{ Body: CreatePatientBody }>,
   reply: FastifyReply,
@@ -27,7 +26,6 @@ export async function createPatientController(
   return reply.status(201).send(patient);
 }
 
-
 export async function listPatientsController(
   request: FastifyRequest<{ Querystring: ListPatientsQuery }>,
   reply: FastifyReply,
@@ -36,7 +34,6 @@ export async function listPatientsController(
 
   return reply.send(result);
 }
-
 
 export async function getPatientWithAppointmentsController(
   request: FastifyRequest<{ Params: GetPatientParams; Querystring: GetPatientQuery }>,
@@ -54,7 +51,6 @@ export async function getPatientWithAppointmentsController(
   return reply.send(patient);
 }
 
-
 export async function updatePatientController(
   request: FastifyRequest<{ Params: GetPatientParams; Body: UpdatePatientBody }>,
   reply: FastifyReply,
@@ -70,7 +66,6 @@ export async function updatePatientController(
 
   return reply.send(updatedPatient);
 }
-
 
 export async function deletePatientController(
   request: FastifyRequest<{ Params: GetPatientParams }>,
