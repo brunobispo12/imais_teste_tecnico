@@ -5,6 +5,7 @@ import { UpdatePatientBody } from '@/modules/patients/schema/update-patient.sche
 import { PatientDTO } from '@/modules/patients/types/patient.dto';
 import { PatientWithAppointmentsDTO } from '@/modules/patients/types/patient-with-appointments.dto';
 import { AppointmentStatusDTO } from '@/modules/appointments/types/appointment-status.dto';
+import { formatDateLabel, formatPriceBRL, formatTimeLabel } from '@/shared/utils/formatters';
 
 const statusMap: Record<string, AppointmentStatusDTO> = {
   AGENDADO: 'SCHEDULED',
@@ -36,21 +37,17 @@ export class PatientsService {
       phone: patient.phone,
       appointments: patient.appointments.map((appointment) => ({
         id: appointment.id,
-        date: `${appointment.date.getDate()} de ${appointment.date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').replace(/^\w/, (c) => c.toUpperCase())}, ${appointment.date.getFullYear()}`,
-        time: appointment.date.toLocaleTimeString('pt-BR', {
-          hour: '2-digit',
-          minute: '2-digit',
-        }).replace(':', 'h'),
+        date: formatDateLabel(appointment.date),
+        time: formatTimeLabel(appointment.date),
+        formattedDate: formatDateLabel(appointment.date),
+        formattedTime: formatTimeLabel(appointment.date),
         status: statusMap[appointment.status] || 'SCHEDULED',
         doctor: {
           id: appointment.doctor.id,
           name: appointment.doctor.name,
           specialty: appointment.doctor.specialty,
         },
-        price: new Intl.NumberFormat('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
-        }).format(Number(appointment.doctor.consultationPrice)),
+        price: formatPriceBRL(appointment.doctor.consultationPrice),
       })),
     };
   }

@@ -5,14 +5,19 @@ import { ListDoctorsQuery } from '@/modules/doctors/schema/list-doctors-query.sc
 import { UpdateDoctorBody } from '@/modules/doctors/schema/update-doctor.schema';
 import { DoctorDTO } from '@/modules/doctors/types/doctor.dto';
 import { DoctorScheduleDTO } from '@/modules/doctors/types/doctor-schedule.dto';
+import { formatPriceBRL } from '@/shared/utils/formatters';
 
 export class DoctorsService {
   async create(data: CreateDoctorBody): Promise<DoctorDTO> {
-    return await doctorsRepository.create({
+    const doctor = await doctorsRepository.create({
       name: data.name,
       specialty: data.specialty,
       consultationPrice: data.consultationPrice,
     });
+    return {
+      ...doctor,
+      consultationPrice: formatPriceBRL(doctor.consultationPrice),
+    };
   }
 
   async createSchedule(doctorId: string, data: CreateScheduleBody): Promise<DoctorScheduleDTO> {
@@ -60,7 +65,11 @@ export class DoctorsService {
       return null;
     }
 
-    return await doctorsRepository.update(id, data);
+    const updated = await doctorsRepository.update(id, data);
+    return {
+      ...updated,
+      consultationPrice: formatPriceBRL(updated.consultationPrice),
+    };
   }
 
   async delete(id: string) {
@@ -79,7 +88,10 @@ export class DoctorsService {
     const { doctors, total } = await doctorsRepository.findAll(page, limit);
 
     return {
-      data: doctors,
+      data: doctors.map((doctor) => ({
+        ...doctor,
+        consultationPrice: formatPriceBRL(doctor.consultationPrice),
+      })),
       meta: {
         page,
         limit,

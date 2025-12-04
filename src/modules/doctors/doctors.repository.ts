@@ -11,7 +11,7 @@ export class DoctorsRepository {
     });
     return {
       ...doctor,
-      consultationPrice: Number(doctor.consultationPrice),
+      consultationPrice: Number(doctor.consultationPrice).toString(),
     };
   }
 
@@ -29,7 +29,7 @@ export class DoctorsRepository {
 
     return {
       ...doctor,
-      consultationPrice: Number(doctor.consultationPrice),
+      consultationPrice: Number(doctor.consultationPrice).toString(),
       schedules: doctor.schedules.map((schedule) => ({
         ...schedule,
       })),
@@ -45,7 +45,7 @@ export class DoctorsRepository {
     });
     return {
       ...doctor,
-      consultationPrice: Number(doctor.consultationPrice),
+      consultationPrice: Number(doctor.consultationPrice).toString(),
     };
   }
 
@@ -72,7 +72,7 @@ export class DoctorsRepository {
     return {
       doctors: doctors.map((doctor) => ({
         ...doctor,
-        consultationPrice: Number(doctor.consultationPrice),
+        consultationPrice: Number(doctor.consultationPrice).toString(),
       })),
       total,
     };

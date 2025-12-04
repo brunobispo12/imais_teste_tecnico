@@ -3,6 +3,7 @@ import { doctorsRepository } from '@/modules/doctors/doctors.repository';
 import { CreateAppointmentBody } from '@/modules/appointments/schema/create-appointment.schema';
 import { AppointmentDTO } from '@/modules/appointments/types/appointment.dto';
 import { mailtrapClient } from '@/services/mailtrap.service';
+import { formatDateLabel, formatPriceBRL, formatTimeLabel } from '@/shared/utils/formatters';
 
 export class AppointmentsService {
   async create(data: CreateAppointmentBody): Promise<AppointmentDTO> {
@@ -67,7 +68,9 @@ export class AppointmentsService {
         name: appointment.doctor.name,
         specialty: appointment.doctor.specialty,
       },
-      price: Number(appointment.doctor.consultationPrice).toFixed(2),
+      formattedDate: formatDateLabel(appointmentDate),
+      formattedTime: formatTimeLabel(appointmentDate),
+      price: formatPriceBRL(appointment.doctor.consultationPrice),
     };
   }
 
@@ -106,7 +109,7 @@ export class AppointmentsService {
         },
         to: [{ email: to }],
         subject: 'Confirmacao de Agendamento',
-        text: `Ola ${data.patientName}, seu agendamento na Clinica Medical Appointment com ${data.doctorName} (${data.specialty}) foi confirmado para ${data.date} as ${data.time}. Valor: R$ ${data.price.toFixed(2)}.`,
+        text: `Ola ${data.patientName}, seu agendamento na Clinica Medical Appointment com ${data.doctorName} (${data.specialty}) foi confirmado para ${data.date} as ${data.time}. Valor: ${formatPriceBRL(data.price)}.`,
       });
 
     } catch (error: any) {
