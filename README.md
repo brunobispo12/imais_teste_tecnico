@@ -244,10 +244,18 @@ Entao:
 
 ## 4. Testes
 
-Se voce tiver testes configurados (por exemplo com Vitest), pode rodar:
+### 4.1. Sem Docker (Local)
+
+Para rodar os testes unitarios/integracao localmente (usando Vitest):
 
 ```bash
 npm test
 ```
 
-Ou o comando que estiver definido no seu `package.json`.
+### 4.2. Com Docker
+
+Para rodar os testes dentro do container da API (garantindo o mesmo ambiente):
+
+```bash
+docker compose exec api npm test
+```
